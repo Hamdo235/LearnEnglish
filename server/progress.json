@@ -1,0 +1,36 @@
+{
+  "xp": 0,
+  "streak": 1,
+  "lastSeenDate": "2026-04-29",
+  "completedLessons": {},
+  "stats": {
+    "totalAnswers": 1,
+    "correctAnswers": 0,
+    "byBranch": {
+      "vocabulary": {
+        "correct": 0,
+        "total": 0
+      },
+      "grammar": {
+        "correct": 0,
+        "total": 1
+      },
+      "sentence": {
+        "correct": 0,
+        "total": 0
+      },
+      "translation": {
+        "correct": 0,
+        "total": 0
+      },
+      "listening": {
+        "correct": 0,
+        "total": 0
+      },
+      "conjugation": {
+        "correct": 0,
+        "total": 0
+      }
+    }
+  }
+}
