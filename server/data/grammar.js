@@ -293,13 +293,98 @@ function subjunctive() {
 }
 
 // ──────────────────────────────────────────────────────────────
+// C1 extra patterns
+// ──────────────────────────────────────────────────────────────
+function mixedConditional() {
+  const items = [
+    {
+      ctx: 'If she ___ harder then, she ___ fluent now.',
+      correct: 'had studied / would be', wrong: ['studied / would be','had studied / would have been','would study / had been']
+    },
+    {
+      ctx: 'If they ___ more careful, the system ___ stable today.',
+      correct: 'had been / would be', wrong: ['were / would have been','had been / would have been','are / would be']
+    },
+    {
+      ctx: 'If I ___ the right path earlier, I ___ at the top by now.',
+      correct: 'had chosen / would be', wrong: ['chose / would be','had chosen / would have been','choose / am']
+    },
+  ]
+  const it = sample(items)
+  const { options, correctIndex } = buildOptions(it.correct, it.wrong)
+  return {
+    topic: 'Mixed Conditional',
+    prompt: 'Complete the mixed conditional:',
+    sentence: it.ctx,
+    options, correctIndex,
+    explanation: `✅ Mixed conditional: past unreal cause (if + past perfect) → present unreal result (would + base). Used when a past action affects the present.`,
+  }
+}
+
+function cleftSentence() {
+  const items = [
+    { ctx: '___ was persistence that made the difference.',              correct: 'It',    wrong: ['There','What','That'] },
+    { ctx: '___ the team found was a critical flaw in the design.',      correct: 'What',  wrong: ['It','That','Which'] },
+    { ctx: 'It was the CEO ___ approved the final budget.',              correct: 'who',   wrong: ['which','that','what'] },
+    { ctx: '___ I need right now is a clear plan.',                      correct: 'What',  wrong: ['It','There','This'] },
+    { ctx: 'It was only after the meeting ___ we understood the scope.', correct: 'that',  wrong: ['who','which','when'] },
+  ]
+  const it = sample(items)
+  const { options, correctIndex } = buildOptions(it.correct, it.wrong)
+  return {
+    topic: 'Cleft Sentences',
+    prompt: 'Choose the correct word to complete the cleft sentence:',
+    sentence: it.ctx,
+    options, correctIndex,
+    explanation: `✅ Cleft sentences ("It was X that...", "What I need is...") add emphasis. "It clefts" use "it was/is + noun + that/who"; "wh-clefts" start with "What".`,
+  }
+}
+
+function nominalization() {
+  const items = [
+    { ctx: 'The ___ of the new process improved efficiency significantly.',       correct: 'implementation', wrong: ['implement','implemented','implementing'] },
+    { ctx: 'Her ___ of the problem was remarkably insightful.',                    correct: 'analysis',       wrong: ['analyze','analyzed','analyzing'] },
+    { ctx: 'The ___ of risks is key to successful project delivery.',              correct: 'mitigation',     wrong: ['mitigate','mitigated','mitigating'] },
+    { ctx: 'The report called for the ___ of a new regulatory framework.',        correct: 'establishment',  wrong: ['establish','establishes','establishing'] },
+    { ctx: 'There was broad agreement on the ___ of the proposed changes.',       correct: 'significance',   wrong: ['significant','significantly','signify'] },
+  ]
+  const it = sample(items)
+  const { options, correctIndex } = buildOptions(it.correct, it.wrong)
+  return {
+    topic: 'Nominalization',
+    prompt: 'Choose the correct nominalized form:',
+    sentence: it.ctx,
+    options, correctIndex,
+    explanation: `✅ Nominalization transforms verbs/adjectives into nouns (implement → implementation, analyze → analysis). Common in formal writing and C1+ English.`,
+  }
+}
+
+function hedging() {
+  const items = [
+    { ctx: 'This ___ to be a promising direction for further research.',          correct: 'would appear', wrong: ['appears clearly','is obviously','definitely seems'] },
+    { ctx: 'The data ___ that performance could improve.',                         correct: 'seems to suggest', wrong: ['clearly proves','definitely shows','obviously means'] },
+    { ctx: 'There ___ be some benefit to this approach, though results vary.',    correct: 'might well', wrong: ['definitely must','always will','clearly should'] },
+    { ctx: 'In many cases, ___ this reflects a broader systemic issue.',          correct: 'it could be argued that', wrong: ['it is certain that','we know that','it proves that'] },
+  ]
+  const it = sample(items)
+  const { options, correctIndex } = buildOptions(it.correct, it.wrong)
+  return {
+    topic: 'Hedging Language',
+    prompt: 'Choose the appropriate hedging expression:',
+    sentence: it.ctx,
+    options, correctIndex,
+    explanation: `✅ Hedging softens claims: "would appear to", "seems to suggest", "might well", "could be argued". Essential in academic and professional C1 English.`,
+  }
+}
+
+// ──────────────────────────────────────────────────────────────
 // Registry
 // ──────────────────────────────────────────────────────────────
 export const PATTERNS = {
   B1:    [presentSimpleVsContinuous, pastSimpleIrregular, comparativeForm, prepositionsOfTime, countableUncountable],
   B2:    [presentSimpleVsContinuous, pastSimpleIrregular, presentPerfectVsPast, passiveVoice, relativePronouns, prepositionsOfTime],
   'B2+': [presentPerfectVsPast, passiveVoice, relativePronouns, thirdConditional, reportedSpeech],
-  C1:    [thirdConditional, reportedSpeech, inversion, subjunctive],
+  C1:    [thirdConditional, reportedSpeech, inversion, subjunctive, mixedConditional, cleftSentence, nominalization, hedging],
 }
 
 export function generateGrammar(level) {

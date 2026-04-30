@@ -1,8 +1,10 @@
 {
+  "version": 2,
   "xp": 0,
-  "streak": 1,
-  "lastSeenDate": "2026-04-29",
+  "streak": 2,
+  "lastSeenDate": "2026-04-30",
   "completedLessons": {},
+  "dailyXP": {},
   "stats": {
     "totalAnswers": 1,
     "correctAnswers": 0,

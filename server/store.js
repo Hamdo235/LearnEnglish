@@ -6,11 +6,15 @@ import { fileURLToPath } from 'node:url'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const FILE = path.join(__dirname, 'progress.json')
 
+const CURRENT_VERSION = 2
+
 const DEFAULT_STATE = {
+  version: CURRENT_VERSION,
   xp: 0,
   streak: 1,
   lastSeenDate: null,
   completedLessons: {},   // { lessonId: { stars: 1-3, completedAt, score } }
+  dailyXP: {},            // { "YYYY-MM-DD": xp }
   stats: {
     totalAnswers: 0,
     correctAnswers: 0,
@@ -25,13 +29,34 @@ const DEFAULT_STATE = {
   },
 }
 
+function migrate(state) {
+  if (!state.version) {
+    // v0 → v1: add dailyXP
+    state.version = 1
+    state.dailyXP = {}
+  }
+  if (state.version < 2) {
+    // v1 → v2: ensure all branches exist in byBranch
+    const branches = ['vocabulary','grammar','sentence','translation','listening','conjugation']
+    state.stats = state.stats || {}
+    state.stats.byBranch = state.stats.byBranch || {}
+    for (const b of branches) {
+      state.stats.byBranch[b] = state.stats.byBranch[b] || { correct: 0, total: 0 }
+    }
+    state.version = 2
+  }
+  return state
+}
+
 let cache = null
 
 export async function load() {
   if (cache) return cache
   try {
     const raw = await fs.readFile(FILE, 'utf-8')
-    cache = { ...DEFAULT_STATE, ...JSON.parse(raw) }
+    const parsed = JSON.parse(raw)
+    cache = migrate({ ...JSON.parse(JSON.stringify(DEFAULT_STATE)), ...parsed })
+    await save(cache)
   } catch {
     cache = JSON.parse(JSON.stringify(DEFAULT_STATE))
     await save(cache)

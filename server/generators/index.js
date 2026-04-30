@@ -1,20 +1,19 @@
 import { sample, sampleN, shuffle, uid } from '../utils.js'
-import { wordsAt, wordsUpTo } from '../data/words.js'
+import { wordsAt, wordsUpTo, idiomsForLevel } from '../data/words.js'
 import { VERBS, SUBJECTS, TENSES, verbsForLevel, tensesForLevel } from '../data/verbs.js'
 import { translationsForLevel } from '../data/translations.js'
 import { templatesForLevel, POOLS } from '../data/templates.js'
 import { generateGrammar } from '../data/grammar.js'
 
 // ─── 1. VOCABULARY ───────────────────────────────────────────
-// MCQ: word → translation (FR), or definition.
+// Randomly produce: MCQ flashcard (40%), cloze test (40%), idiom (20%)
 export function genVocabulary(level) {
+  const r = Math.random()
+  if (r < 0.20 && ['B2','B2+','C1'].includes(level)) return genIdiom(level)
+  if (r < 0.55) return genCloze(level)
   const pool = wordsAt(level)
-  if (pool.length < 4) {
-    // mix levels if not enough at this level
-    const wider = wordsUpTo(level)
-    return buildVocabMCQ(sample(wider), wider)
-  }
-  return buildVocabMCQ(sample(pool), pool)
+  const wider = pool.length < 4 ? wordsUpTo(level) : pool
+  return buildVocabMCQ(sample(wider), wider)
 }
 
 function buildVocabMCQ(target, pool) {
@@ -201,6 +200,59 @@ export function genConjugation(level) {
     sub: tense.label,
     explanation: `✅ ${tense.label}: ${subj.word} ${correct}.`,
     xp: 18,
+  }
+}
+
+// ─── 7. CLOZE ────────────────────────────────────────────────
+// Show example sentence with word blanked out; pick the missing word.
+export function genCloze(level) {
+  const pool = wordsAt(level).length >= 4 ? wordsAt(level) : wordsUpTo(level)
+  let attempts = 0
+  let target
+  do {
+    target = sample(pool)
+    attempts++
+  } while (attempts < 10 && !target.ex.toLowerCase().includes(target.en.toLowerCase()))
+
+  const regex = new RegExp(`\\b${target.en.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}\\b`, 'i')
+  const sentence = target.ex.replace(regex, '___')
+  const distractors = sampleN(pool.filter(w => w.en !== target.en), 3).map(w => w.en)
+  const options = shuffle([target.en, ...distractors])
+  return {
+    id: uid(),
+    type: 'mcq',
+    branch: 'vocabulary',
+    prompt: 'Fill in the blank:',
+    question: sentence,
+    sub: 'Context Clue',
+    options,
+    correctIndex: options.indexOf(target.en),
+    explanation: `✅ "${target.en}" (${target.pos}) — ${target.def}`,
+    xp: 12,
+  }
+}
+
+// ─── 8. IDIOM ────────────────────────────────────────────────
+export function genIdiom(level) {
+  const pool = idiomsForLevel(level)
+  if (!pool.length) return genCloze(level)
+  const target = sample(pool)
+  const mode = Math.random() > 0.5 ? 'meaning' : 'fr'
+  const correct = mode === 'fr' ? target.fr : target.def
+  const distractors = sampleN(pool.filter(i => i.en !== target.en), 3)
+    .map(i => mode === 'fr' ? i.fr : i.def)
+  const options = shuffle([correct, ...distractors])
+  return {
+    id: uid(),
+    type: 'mcq',
+    branch: 'vocabulary',
+    prompt: mode === 'fr' ? 'What is the French equivalent of this idiom?' : 'What does this idiom mean?',
+    question: `"${target.en}"`,
+    sub: 'Idiom',
+    options,
+    correctIndex: options.indexOf(correct),
+    explanation: `✅ "${target.en}" = ${target.def}. Example: "${target.ex}"`,
+    xp: 14,
   }
 }
 

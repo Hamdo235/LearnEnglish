@@ -9,6 +9,52 @@ const BRANCHES = {
   conjugation: { icon:'⚡', label:'Conjugation',    color:'var(--gold)'   },
 }
 
+// Build last 7 days date labels
+function last7Days() {
+  return Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(Date.now() - (6 - i) * 86400000)
+    return {
+      key: d.toISOString().slice(0, 10),
+      label: d.toLocaleDateString('en', { weekday: 'short' }),
+    }
+  })
+}
+
+// Simple SVG bar chart
+function XPChart({ dailyXP = {} }) {
+  const days   = last7Days()
+  const values = days.map(d => dailyXP[d.key] || 0)
+  const maxVal = Math.max(...values, 10)
+  const W = 280, H = 80, PAD = 4
+  const bw = (W - PAD * 2) / 7 - 3
+
+  return (
+    <div style={{ marginBottom:18 }}>
+      <div style={{ fontSize:13, fontWeight:600, color:'var(--dim)', marginBottom:8 }}>XP — last 7 days</div>
+      <svg width={W} height={H + 18} style={{ overflow:'visible' }}>
+        {days.map((d, i) => {
+          const bh  = Math.max(4, (values[i] / maxVal) * H)
+          const x   = PAD + i * ((W - PAD * 2) / 7) + 1.5
+          const y   = H - bh
+          const isToday = i === 6
+          return (
+            <g key={d.key}>
+              <rect x={x} y={y} width={bw} height={bh}
+                rx={4} fill={isToday ? 'var(--gold2)' : 'rgba(255,255,255,0.18)'} />
+              {values[i] > 0 && (
+                <text x={x + bw / 2} y={y - 3} textAnchor="middle"
+                  fontSize="9" fill="var(--dim)">{values[i]}</text>
+              )}
+              <text x={x + bw / 2} y={H + 14} textAnchor="middle"
+                fontSize="9" fill={isToday ? 'var(--gold2)' : 'var(--dim)'}>{d.label}</text>
+            </g>
+          )
+        })}
+      </svg>
+    </div>
+  )
+}
+
 export default function Stats({ progress }) {
   if (!progress) return <div className="wrap"><div className="card" style={{ padding:24, color:'var(--dim)' }}>Loading…</div></div>
 
@@ -17,6 +63,17 @@ export default function Stats({ progress }) {
     ? Math.round((progress.stats.correctAnswers / progress.stats.totalAnswers) * 100)
     : 0
   const completed = Object.keys(progress.completedLessons || {}).length
+
+  // Weakest branch (lowest accuracy, min 5 attempts)
+  const branchEntries = Object.entries(progress.stats.byBranch || {})
+  const weakest = branchEntries
+    .filter(([, s]) => s.total >= 5)
+    .map(([k, s]) => ({ key: k, acc: s.total ? s.correct / s.total : 1 }))
+    .sort((a, b) => a.acc - b.acc)[0]
+
+  // Estimated words learned = total correct answers in vocabulary
+  const vocabStats  = progress.stats.byBranch?.vocabulary || { correct: 0, total: 0 }
+  const wordsLearned = vocabStats.correct
 
   return (
     <div className="wrap fade-in">
@@ -65,6 +122,33 @@ export default function Stats({ progress }) {
         <div className="stat"><div className="stat-val" style={{ color:'var(--red)' }}>🔥 {progress.streak}</div><div className="stat-lbl">Streak</div></div>
         <div className="stat"><div className="stat-val">{completed}</div><div className="stat-lbl">Lessons</div></div>
         <div className="stat"><div className="stat-val">{totalAcc}%</div><div className="stat-lbl">Accuracy</div></div>
+      </div>
+
+      {/* Words learned + weakest branch */}
+      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12, marginBottom:18 }}>
+        <div className="card" style={{ padding:16, textAlign:'center' }}>
+          <div style={{ fontSize:28, marginBottom:4 }}>📖</div>
+          <div style={{ fontFamily:'Playfair Display,serif', fontSize:26, color:'var(--gold2)', fontWeight:700 }}>{wordsLearned}</div>
+          <div style={{ fontSize:11, color:'var(--dim)', marginTop:2 }}>Words Learned</div>
+        </div>
+        {weakest ? (
+          <div className="card" style={{ padding:16, textAlign:'center', borderColor:'rgba(255,107,107,0.35)', background:'rgba(255,107,107,0.06)' }}>
+            <div style={{ fontSize:28, marginBottom:4 }}>{BRANCHES[weakest.key]?.icon || '🎯'}</div>
+            <div style={{ fontSize:13, fontWeight:700, color:'var(--red)', marginBottom:2 }}>Weak area</div>
+            <div style={{ fontSize:13, color:'var(--cream)' }}>{BRANCHES[weakest.key]?.label}</div>
+            <div style={{ fontSize:11, color:'var(--dim)', marginTop:2 }}>{Math.round(weakest.acc * 100)}% accuracy</div>
+          </div>
+        ) : (
+          <div className="card" style={{ padding:16, textAlign:'center' }}>
+            <div style={{ fontSize:28, marginBottom:4 }}>✨</div>
+            <div style={{ fontSize:12, color:'var(--dim)' }}>Keep practising to see your weak area</div>
+          </div>
+        )}
+      </div>
+
+      {/* 7-day XP chart */}
+      <div className="card" style={{ padding:16, marginBottom:18, overflow:'hidden' }}>
+        <XPChart dailyXP={progress.dailyXP || {}} />
       </div>
 
       {/* Per-branch */}

@@ -1,7 +1,19 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 export default function MCQ({ exercise, onAnswer, locked, result }) {
   const [picked, setPicked] = useState(null)
+
+  useEffect(() => { setPicked(null) }, [exercise?.id])
+
+  useEffect(() => {
+    const handler = (e) => {
+      if (locked || picked !== null) return
+      const n = parseInt(e.key)
+      if (n >= 1 && n <= exercise.options.length) choose(n - 1)
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  })
 
   const choose = (i) => {
     if (locked || picked !== null) return
@@ -21,17 +33,22 @@ export default function MCQ({ exercise, onAnswer, locked, result }) {
           let cls = 'opt'
           if (showResult) {
             if (i === result.correctIndex) cls += ' ok'
-            else if (picked === i) cls += ' bad'
+            else if (picked === i && picked !== result.correctIndex) cls += ' bad'
           } else if (picked === i) {
-            cls += ' ok'
+            cls += ' selected'
           }
+          const kbHint = !showResult && !picked && i < 9
           return (
             <button key={i} className={cls} onClick={() => choose(i)} disabled={locked || picked !== null}>
-              <span style={{ opacity:.55, marginRight:10, fontWeight:700 }}>{String.fromCharCode(65 + i)}.</span>{o}
+              <span className="opt-key">{kbHint ? i + 1 : String.fromCharCode(65 + i)+'.'}</span>
+              {o}
             </button>
           )
         })}
       </div>
+      {!showResult && picked === null && (
+        <div className="kbd-hint">Press 1–{exercise.options.length} to select</div>
+      )}
     </div>
   )
 }

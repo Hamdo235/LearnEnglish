@@ -278,4 +278,91 @@ body { min-height: 100dvh; }
   .g3 { grid-template-columns: 1fr 1fr; }
   .lesson-node { width: 64px; height: 64px; font-size: 22px; }
 }
+
+/* ── TOKEN STATES (Reorder) ── */
+.token-anim { animation: tokenPop .18s var(--ease); }
+@keyframes tokenPop { from { transform: scale(0.85); opacity: .5; } to { transform: scale(1); opacity: 1; } }
+.token-ok   { background: linear-gradient(135deg, rgba(95,199,148,0.30), rgba(95,199,148,0.12)) !important; border-color: rgba(95,199,148,0.55) !important; color: #5FC794; }
+.token-bad  { background: linear-gradient(135deg, rgba(234,108,108,0.28), rgba(234,108,108,0.10)) !important; border-color: rgba(234,108,108,0.55) !important; color: #EA6C6C; }
+.token-warn { background: linear-gradient(135deg, rgba(240,211,122,0.25), rgba(240,211,122,0.08)) !important; border-color: rgba(240,211,122,0.45) !important; color: #F0D37A; }
+
+/* ── SELF-CHECK OVERLAY ── */
+.self-check {
+  margin-top: 12px; padding: 16px 18px; border-radius: 16px;
+  background: linear-gradient(135deg, rgba(240,211,122,0.12), rgba(240,211,122,0.04));
+  border: 1px solid rgba(240,211,122,0.35);
+}
+.btn-ok  { background: linear-gradient(135deg, rgba(95,199,148,0.28), rgba(95,199,148,0.10)); border: 1px solid rgba(95,199,148,0.45); color: #5FC794; border-radius: 12px; padding: 12px 8px; font-weight: 700; cursor: pointer; font-size: 14px; }
+.btn-bad { background: linear-gradient(135deg, rgba(234,108,108,0.24), rgba(234,108,108,0.08)); border: 1px solid rgba(234,108,108,0.40); color: #EA6C6C; border-radius: 12px; padding: 12px 8px; font-weight: 700; cursor: pointer; font-size: 14px; }
+.btn-ok:hover  { background: rgba(95,199,148,0.38); }
+.btn-bad:hover { background: rgba(234,108,108,0.34); }
+
+/* ── VOICE WARNING ── */
+.voice-warning {
+  margin: 8px 0; padding: 10px 14px; border-radius: 12px; font-size: 12.5px;
+  background: rgba(234,108,108,0.10); border: 1px solid rgba(234,108,108,0.30); color: var(--cream);
+}
+
+/* ── OFFLINE BANNER ── */
+.offline-banner {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 9000;
+  background: linear-gradient(90deg, rgba(234,108,108,0.92), rgba(180,60,60,0.92));
+  backdrop-filter: blur(10px); color: #fff;
+  text-align: center; font-size: 13px; font-weight: 600;
+  padding: calc(var(--safe-top) + 6px) 16px 8px;
+}
+
+/* ── MCQ keyboard hint ── */
+.opt-key {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 20px; height: 20px; border-radius: 5px; font-size: 11px; font-weight: 700;
+  background: rgba(255,255,255,0.10); border: 1px solid rgba(255,255,255,0.18);
+  margin-right: 10px; flex-shrink: 0;
+}
+.opt.selected { border-color: rgba(240,211,122,0.55); background: rgba(240,211,122,0.12); }
+.kbd-hint { text-align: center; font-size: 11px; color: var(--dim); margin-top: 6px; }
+
+/* ── ANIMATIONS: confetti + XP float ── */
+@keyframes confetti-fall {
+  0%   { transform: translateY(0) rotate(0deg);   opacity: 1; }
+  100% { transform: translateY(110vh) rotate(540deg); opacity: 0; }
+}
+@keyframes xp-float {
+  0%   { transform: translateY(0);   opacity: 1; }
+  70%  { transform: translateY(-40px); opacity: 1; }
+  100% { transform: translateY(-60px); opacity: 0; }
+}
+
+/* ── LIGHT MODE ── */
+[data-theme="light"] {
+  --bg:    #F5F3EE;
+  --cream: #1A1812;
+  --dim:   #6B6456;
+}
+[data-theme="light"] html,
+[data-theme="light"] body,
+[data-theme="light"] #root { background: var(--bg); color: var(--cream); }
+[data-theme="light"] .aurora {
+  background:
+    radial-gradient(1200px 700px at 10% -10%, rgba(212,183,92,0.14), transparent 60%),
+    radial-gradient(900px 600px at 100% 10%, rgba(164,139,230,0.10), transparent 60%),
+    linear-gradient(180deg, #F5F3EE 0%, #EDE9E0 100%);
+}
+[data-theme="light"] .card,
+[data-theme="light"] .glass-strong {
+  background: rgba(255,255,255,0.72);
+  border-color: rgba(0,0,0,0.10);
+  box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+}
+[data-theme="light"] .opt {
+  background: rgba(0,0,0,0.05);
+  border-color: rgba(0,0,0,0.14);
+  color: var(--cream);
+}
+[data-theme="light"] .opt:hover { background: rgba(0,0,0,0.09); }
+[data-theme="light"] .sidebar,
+[data-theme="light"] .sidebar-inner { background: rgba(255,255,255,0.85) !important; }
+[data-theme="light"] .topbar   { background: rgba(255,255,255,0.80) !important; }
+[data-theme="light"] .bottomnav { background: rgba(255,255,255,0.90) !important; }
+[data-theme="light"] .pbar     { background: rgba(0,0,0,0.10) !important; }
 `

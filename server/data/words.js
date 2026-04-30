@@ -139,6 +139,42 @@ export const WORDS = {
   ],
 }
 
+// ── IDIOMS ────────────────────────────────────────────────────
+// Each entry: { en, fr, def, ex, level }
+export const IDIOMS = [
+  // B2
+  { en: 'beat around the bush',    fr: 'tourner autour du pot',        def: 'avoid getting to the main point',                        ex: 'Stop beating around the bush and tell me the truth.',   level: 'B2' },
+  { en: 'get the ball rolling',    fr: 'lancer les choses',            def: 'start an activity or process',                           ex: 'Let\'s get the ball rolling on this project.',           level: 'B2' },
+  { en: 'cut corners',             fr: 'prendre des raccourcis',       def: 'do something badly to save time/money',                  ex: 'Don\'t cut corners on safety.',                          level: 'B2' },
+  { en: 'bite the bullet',         fr: 'serrer les dents',             def: 'endure a painful situation with courage',                 ex: 'Just bite the bullet and do the hard part first.',       level: 'B2' },
+  { en: 'on the fence',            fr: 'indécis, entre deux chaises',  def: 'undecided about something',                              ex: 'I\'m still on the fence about the job offer.',           level: 'B2' },
+  { en: 'hit the nail on the head',fr: 'mettre le doigt dessus',       def: 'describe exactly what is causing a situation',           ex: 'You hit the nail on the head with that analysis.',       level: 'B2' },
+  { en: 'go back to the drawing board', fr: 'tout reprendre à zéro',  def: 'start something again from the beginning',               ex: 'The plan failed — we go back to the drawing board.',     level: 'B2' },
+  { en: 'a blessing in disguise',  fr: 'un bienfait caché',            def: 'something good that seemed bad at first',                 ex: 'Losing that job was a blessing in disguise.',            level: 'B2' },
+  { en: 'under the weather',       fr: 'patraque, pas dans son assiette', def: 'feeling slightly ill',                                 ex: 'I\'m feeling a bit under the weather today.',            level: 'B2' },
+  { en: 'break the ice',           fr: 'briser la glace',              def: 'do or say something to relieve tension',                 ex: 'He broke the ice with a funny story.',                   level: 'B2' },
+  { en: 'the ball is in your court', fr: 'la balle est dans ton camp', def: 'it is your turn to take action',                         ex: 'I\'ve made my offer — the ball is in your court.',       level: 'B2' },
+  { en: 'spill the beans',         fr: 'vendre la mèche',              def: 'reveal a secret accidentally',                           ex: 'Who spilled the beans about the surprise party?',        level: 'B2' },
+  // B2+
+  { en: 'the elephant in the room',fr: 'l\'éléphant dans la pièce',    def: 'an obvious problem nobody wants to discuss',             ex: 'The budget deficit is the elephant in the room.',        level: 'B2+' },
+  { en: 'burn bridges',            fr: 'brûler ses ponts',             def: 'permanently destroy a relationship',                      ex: 'Don\'t burn bridges when you leave a job.',              level: 'B2+' },
+  { en: 'read between the lines',  fr: 'lire entre les lignes',        def: 'understand a hidden meaning',                            ex: 'Read between the lines of his email.',                   level: 'B2+' },
+  { en: 'move the goalposts',      fr: 'changer les règles en cours de route', def: 'change the rules unfairly during a task',         ex: 'They keep moving the goalposts on us.',                  level: 'B2+' },
+  { en: 'a double-edged sword',    fr: 'une arme à double tranchant',  def: 'something with both advantages and disadvantages',       ex: 'Social media is a double-edged sword.',                  level: 'B2+' },
+  { en: 'sit on the fence',        fr: 'ne pas se mouiller',           def: 'refuse to take sides',                                   ex: 'Politicians often sit on the fence.',                    level: 'B2+' },
+  // C1
+  { en: 'cut to the chase',        fr: 'aller droit au but',           def: 'get to the point without wasting time',                  ex: 'Let\'s cut to the chase — what do you want?',            level: 'C1' },
+  { en: 'take something with a pinch of salt', fr: 'prendre avec des pincettes', def: 'not believe something completely',              ex: 'Take his claims with a pinch of salt.',                  level: 'C1' },
+  { en: 'the tip of the iceberg',  fr: 'la partie émergée de l\'iceberg', def: 'a small visible part of a larger problem',             ex: 'This data is just the tip of the iceberg.',              level: 'C1' },
+  { en: 'throw caution to the wind', fr: 'se jeter à l\'eau',          def: 'take a risk without worrying',                           ex: 'She threw caution to the wind and launched.',            level: 'C1' },
+  { en: 'through the grapevine',   fr: 'par le bouche-à-oreille',      def: 'heard as rumour or gossip',                              ex: 'I heard through the grapevine that he\'s leaving.',      level: 'C1' },
+]
+
+export function idiomsForLevel(level) {
+  const idx = ['B1','B2','B2+','C1'].indexOf(level)
+  return IDIOMS.filter(i => ['B1','B2','B2+','C1'].indexOf(i.level) <= idx)
+}
+
 export function wordsAt(level) {
   return WORDS[level] || []
 }

@@ -16,11 +16,25 @@ const NAV = [
 ]
 
 export default function App() {
-  const [view, setView] = useState('path')
-  const [progress, setProgress] = useState(null)
+  const [view,         setView]         = useState('path')
+  const [progress,     setProgress]     = useState(null)
   const [activeLesson, setActiveLesson] = useState(null)
-  const [refreshKey, setRefreshKey] = useState(0)
-  const [error, setError] = useState(null)
+  const [refreshKey,   setRefreshKey]   = useState(0)
+  const [error,        setError]        = useState(null)
+  const [online,       setOnline]       = useState(navigator.onLine)
+  const [darkMode,     setDarkMode]     = useState(() => localStorage.getItem('fs_dark') !== 'false')
+
+  // ── Offline detection ──────────────────────────────────────
+  useEffect(() => {
+    const up   = () => setOnline(true)
+    const down = () => setOnline(false)
+    window.addEventListener('online',  up)
+    window.addEventListener('offline', down)
+    return () => { window.removeEventListener('online', up); window.removeEventListener('offline', down) }
+  }, [])
+
+  // ── Dark mode persistence ──────────────────────────────────
+  useEffect(() => { localStorage.setItem('fs_dark', String(darkMode)) }, [darkMode])
 
   const refresh = useCallback(async () => {
     try {
@@ -83,12 +97,17 @@ export default function App() {
     <>
       <style>{CSS}</style>
       <div className="aurora" />
-      <div className="app">
+      <div className="app" data-theme={darkMode ? 'dark' : 'light'}>
+        {!online && (
+          <div className="offline-banner">
+            📡 You are offline — progress will sync when reconnected
+          </div>
+        )}
         {!activeLesson && (
           <Sidebar view={view} setView={setView} progress={progress} />
         )}
         <main className="main">
-          {!activeLesson && <TopBar progress={progress} />}
+          {!activeLesson && <TopBar progress={progress} darkMode={darkMode} onToggleDark={() => setDarkMode(d => !d)} />}
           {renderView()}
         </main>
         {!activeLesson && <BottomNav view={view} setView={setView} />}
@@ -146,7 +165,7 @@ function Sidebar({ view, setView, progress }) {
   )
 }
 
-function TopBar({ progress }) {
+function TopBar({ progress, darkMode, onToggleDark }) {
   return (
     <div className="topbar">
       <div className="tb-title">
@@ -158,12 +177,18 @@ function TopBar({ progress }) {
           )}
         </div>
       </div>
-      {progress && (
-        <div className="tb-stat">
-          <span style={{ fontSize:13, fontWeight:700, color:'var(--red)' }}>🔥{progress.streak}</span>
-          <span className={`lvl-chip lvl-${levelKey(progress.level)}`} style={{ fontSize:10 }}>{progress.level}</span>
-        </div>
-      )}
+      <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+        {progress && (
+          <div className="tb-stat">
+            <span style={{ fontSize:13, fontWeight:700, color:'var(--red)' }}>🔥{progress.streak}</span>
+            <span className={`lvl-chip lvl-${levelKey(progress.level)}`} style={{ fontSize:10 }}>{progress.level}</span>
+          </div>
+        )}
+        <button onClick={onToggleDark} className="btn-icon" title={darkMode ? 'Switch to Light' : 'Switch to Dark'}
+          style={{ background:'rgba(255,255,255,0.1)', border:'1px solid rgba(255,255,255,0.18)', borderRadius:8, width:32, height:32, cursor:'pointer', fontSize:16, display:'flex', alignItems:'center', justifyContent:'center' }}>
+          {darkMode ? '☀️' : '🌙'}
+        </button>
+      </div>
     </div>
   )
 }

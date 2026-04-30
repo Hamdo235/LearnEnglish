@@ -137,7 +137,8 @@ app.post('/api/check', async (req, res) => {
     correct = JSON.stringify(userOrder) === JSON.stringify(ex.correctOrder)
   }
 
-  // Persist stats
+  // Persist stats + dailyXP
+  const today = new Date().toISOString().slice(0, 10)
   await store.update(state => {
     const branch = ex.branch
     const bs = state.stats.byBranch[branch] || { correct: 0, total: 0 }
@@ -148,13 +149,19 @@ app.post('/api/check', async (req, res) => {
     state.stats.totalAnswers += 1
     if (correct) {
       state.stats.correctAnswers += 1
-      state.xp += ex.xp || 10
+      const gained = ex.xp || 10
+      state.xp += gained
+      state.dailyXP = state.dailyXP || {}
+      state.dailyXP[today] = (state.dailyXP[today] || 0) + gained
     }
     return state
   })
 
+  const needsSelfCheck = ex.type === 'typed' && ex.branch === 'translation'
+
   res.json({
     correct,
+    needsSelfCheck,
     explanation: ex.explanation,
     correctAnswer:
       ex.type === 'mcq' ? ex.options[ex.correctIndex]
